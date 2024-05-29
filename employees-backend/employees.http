@@ -1,0 +1,53 @@
+###
+GET http://localhost:8080/api/employees
+Accept: application/json
+
+###
+GET http://localhost:8080/api/employees/2
+Accept: application/json
+
+###
+POST http://localhost:8080/api/employees
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Jack Doe"
+}
+
+###
+PUT http://localhost:8080/api/employees/1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "John Doe"
+}
+
+###
+GET http://localhost:8080/actuator
+
+###
+GET http://localhost:8080/actuator/employees-info
+
+###
+GET http://localhost:8080/actuator/health
+
+###
+GET http://localhost:8080/actuator/info
+
+###
+GET http://localhost:8080/actuator/sbom/application
+
+###
+GET http://localhost:8080/actuator/startup
+
+###
+GET http://localhost:8080/actuator/env
+
+###
+GET http://localhost:8080/actuator/env/spring.datasource.url
+
+###
+GET http://localhost:8080/actuator/liquibase
+
