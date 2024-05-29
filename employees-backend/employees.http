@@ -28,26 +28,54 @@ Accept: application/json
 GET http://localhost:8080/actuator
 
 ###
-GET http://localhost:8080/actuator/employees-info
+GET http://localhost:8080/actuator/health
 
 ###
-GET http://localhost:8080/actuator/health
+GET http://localhost:8080/actuator/mappings
 
 ###
 GET http://localhost:8080/actuator/info
 
 ###
+GET http://localhost:8080/actuator/sbom
+
+###
 GET http://localhost:8080/actuator/sbom/application
 
 ###
-GET http://localhost:8080/actuator/startup
+GET http://localhost:8080/actuator/loggers
 
 ###
-GET http://localhost:8080/actuator/env
+GET http://localhost:8080/actuator/loggers/employees
 
 ###
-GET http://localhost:8080/actuator/env/spring.datasource.url
+POST http://localhost:8080/actuator/loggers/employees
+Content-Type: application/json
+
+{
+  "configuredLevel": "info"
+}
+
+###
+GET http://localhost:8080/actuator/logfile
+
+###
+POST http://localhost:8080/actuator/shutdown
+
+###
+GET http://localhost:8080/actuator/metrics
+
+###
+GET http://localhost:8080/actuator/metrics/jdbc.connections.active
+
+###
+GET http://localhost:8080/actuator/metrics/http.server.requests
+
+###
+GET http://localhost:8080/actuator/prometheus
+
+###
+GET http://localhost:8080/actuator/metrics/employee.create
 
 ###
 GET http://localhost:8080/actuator/liquibase
-

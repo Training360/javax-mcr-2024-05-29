@@ -1,5 +1,6 @@
 package employees;
 
+import io.micrometer.core.annotation.Timed;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import java.util.function.Supplier;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class EmployeesService {
 
     private EmployeesRepository repository;
@@ -22,7 +24,10 @@ public class EmployeesService {
         return toDto(repository.findById(id).orElseThrow(notFountException(id)));
     }
 
+    @Timed(value="employee.create")
     public EmployeeResource createEmployee(EmployeeResource command) {
+        log.info("Create employee");
+        log.debug("Create employee with name: {}", command.name());
         Employee employee = new Employee(command.name());
         repository.save(employee);
         return toDto(employee);

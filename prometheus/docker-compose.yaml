@@ -12,5 +12,3 @@ services:
     container_name: grafana
     ports:
       - 3000:3000
-    env_file:
-      - ./env/grafana.env
