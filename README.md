@@ -75,25 +75,25 @@ GET http://localhost:8080/actuator/info
 ```
 
 ```xml
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>build-info</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>io.github.git-commit-id</groupId>
-				<artifactId>git-commit-id-maven-plugin</artifactId>
-			</plugin>
-    </plugins>
-	</build>
+<build>
+  <plugins>
+    <plugin>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-maven-plugin</artifactId>
+      <executions>
+        <execution>
+          <goals>
+            <goal>build-info</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+    <plugin>
+      <groupId>io.github.git-commit-id</groupId>
+      <artifactId>git-commit-id-maven-plugin</artifactId>
+    </plugin>
+  </plugins>
+</build>
 ```
 
 ```properties
@@ -358,15 +358,41 @@ https://github.com/jdbc-observations/datasource-micrometer
 
 * `pom.xml`: `spring-boot-starter-aop`, `net.ttddyy.observation:datasource-micrometer-spring-boot`
 
+## Naplózás
+
+```shell
+cd efk
+docker compose up -d
+```
+
+```xml
+<dependency>
+  <groupId>com.sndyuk</groupId>
+  <artifactId>logback-more-appenders</artifactId>
+  <version>1.8.8</version>
+</dependency>
+
+<dependency>
+  <groupId>org.fluentd</groupId>
+  <artifactId>fluent-logger</artifactId>
+  <version>0.3.4</version>
+</dependency>
+```
+
+`logback-sample.xml` átnevezése `logback.xml` névre
+
+Kibana: `http://localhost:5601`
+
+Discover / Create data view
+
 
 ## Audit Events - gyakorlat
 
 ```java
-	@Bean
-	public AuditEventRepository auditEventRepository() {
-		return new InMemoryAuditEventRepository();
-	}
-
+@Bean
+public AuditEventRepository auditEventRepository() {
+  return new InMemoryAuditEventRepository();
+}
 ```
 
 ```java
@@ -384,11 +410,10 @@ GET http://localhost:8080/actuator/auditevents
 ## Actuator - HttpExchange - gyakorlat
 
 ```java
-	@Bean
-	public HttpExchangeRepository httpExchangeRepository() {
-		return new InMemoryHttpExchangeRepository();
-	}
-
+@Bean
+public HttpExchangeRepository httpExchangeRepository() {
+  return new InMemoryHttpExchangeRepository();
+}
 ```
 
 ```http
@@ -451,7 +476,6 @@ management.endpoint.env.show-values=ALWAYS
 GET http://localhost:8080/actuator/liquibase
 ```
 
-
 ## Saját végpont
 
 ```java
@@ -480,9 +504,7 @@ GET http://localhost:8080/actuator/employees-info
 
 ## Native image
 
-```plain
-%PARSER_ERROR[d] %PARSER_ERROR[p] 1 --- [%PARSER_ERROR[t]] %PARSER_ERROR[logger] : %PARSER_ERROR[m]%PARSER_ERROR[n]%PARSER_ERROR[d] %PARSER_ERROR[p] 1 --- [%PARSER_ERROR[t]] %PARSER_ERROR[logger] : %PARSER_ERROR[m]%PARSER_ERROR[n]%PARSER_ERROR[d] %PARSER_ERROR[p] 1 --- [%PARSER_ERROR[t]] %PARSER_ERROR[logger] : %PARSER_ERROR[m]%PARSER_ERROR[n]%PARSER_ERROR[d] %PARSER_ERROR[p] 1 --- [%PARSER_ERROR[t]] %PARSER_ERROR[logger] : %PARSER_ERROR[m]%PARSER_ERROR[n]%PARSER_ERROR[d] %PARSER_ERROR[p] 1 --- [%PARSER_ERROR[t]] %PARSER_ERROR[logger] : %PARSER_ERROR[m]%PARSER_ERROR[n]
-```
+`pom.xml`
 
 ```xml
 <plugin>
@@ -492,11 +514,75 @@ GET http://localhost:8080/actuator/employees-info
 ```
 
 ```shell
-mvnw spring-boot:build-image
 mvnw -Pnative spring-boot:build-image
 ```
 
+![Build](images/native-image-build-cmd.png)
 
-## TODO
+![Erőforráshasználat](images/native-image-build-docker.png)
 
-Kubernetes Probes is kivezethető: https://docs.spring.io/spring-boot/reference/actuator/endpoints.html#actuator.endpoints.kubernetes-probes
+Minden verzióban valami probléma, újrapróbálkozás 5-7 perc.
+
+## Docker Desktop frissítés
+
+https://github.com/spring-projects/spring-boot/issues/41199
+
+```
+Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:3.2.5:build-image (default-cli) on project siva-webapp: Execution default-cli of goal org.springframework.boot:spring-boot-maven-plugin:3.2.5:build-image failed: Illegal char <:> at index 5: npipe:////./pipe/dockerDesktopLinuxEngine
+```
+
+A 4.31.1 Docker Desktop (Windows 11) nem működik együtt a Spring Boot 3.3.1-gyel, Java 21.
+
+Megoldás:
+
+```xml
+<plugin>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-maven-plugin</artifactId>
+  <configuration>
+    <docker>
+      <host>//./pipe/dockerDesktopLinuxEngine</host>
+    </docker>
+  </configuration>
+  <!-- ... -->
+</plugin>
+```
+
+## Liquibase
+
+```plaintext
+Caused by: java.lang.NoSuchMethodException: liquibase.database.LiquibaseTableNamesFactory.<init>()
+2024-06-25 13:26:00 employees-app-1  |  at java.base@21.0.3/java.lang.Class.checkMethod(DynamicHub.java:1078)
+2024-06-25 13:26:00 employees-app-1  |  at java.base@21.0.3/java.lang.Class.getConstructor0(DynamicHub.java:1241)
+2024-06-25 13:26:00 employees-app-1  |  at java.base@21.0.3/java.lang.Class.getDeclaredConstructor(DynamicHub.java:2930)
+```
+
+https://github.com/oracle/graalvm-reachability-metadata/issues/431
+
+Liquibase 4.27 még nincs felkészítve a GraalVM-re.
+
+`LoggerUIService.class`, stb.
+
+Megoldás:
+
+```java
+@SpringBootApplication
+@ImportRuntimeHints(EmployeesApplication.EmployeesApplicationRuntimeHints.class)
+public class EmployeesApplication {
+
+  // ...
+
+	static class EmployeesApplicationRuntimeHints implements RuntimeHintsRegistrar {
+		@Override
+		public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
+			hints.reflection()
+					.registerType(LoggerUIService.class, type ->
+						type.withConstructor(Collections.emptyList(), ExecutableMode.INVOKE))
+					.registerType(LiquibaseTableNamesFactory.class, type ->
+							type.withConstructor(Collections.emptyList(), ExecutableMode.INVOKE));
+		}
+	}
+}
+```
+
+https://github.com/liquibase/liquibase/issues/1552

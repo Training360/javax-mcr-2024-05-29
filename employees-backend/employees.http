@@ -79,3 +79,40 @@ GET http://localhost:8080/actuator/metrics/employee.create
 
 ###
 GET http://localhost:8080/actuator/liquibase
+
+###
+GET http://localhost:8080/actuator/metrics/list.employees
+
+###
+GET http://localhost:8080/actuator/auditevents
+
+###
+GET http://localhost:8080/actuator/httpexchanges
+
+###
+GET http://localhost:8080/actuator/threaddump
+Accept: text/plain
+
+###
+GET http://localhost:8080/actuator/beans
+
+###
+GET http://localhost:8080/actuator/conditions
+
+###
+GET http://localhost:8080/actuator/mappings
+
+###
+GET http://localhost:8080/actuator/configprops
+
+###
+GET http://localhost:8080/actuator/env
+
+###
+GET http://localhost:8080/actuator/env/spring.datasource.url
+
+###
+GET http://localhost:8080/actuator/liquibase
+
+###
+GET http://localhost:8080/actuator/employeesinfo

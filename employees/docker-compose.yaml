@@ -1,0 +1,28 @@
+services:
+  postgresql:
+    image: postgres
+    expose:
+      - 5432
+    environment:
+      POSTGRES_DB: employees
+      POSTGRES_USER: employees
+      POSTGRES_PASSWORD: employees
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U employees -d employees'"]
+      interval: 3s
+      timeout: 2s
+      retries: 10
+
+  employees-app:
+    image: docker.io/library/employees-backend:0.0.1-SNAPSHOT
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    expose:
+      - 8080
+    environment:
+      SPRING_DATASOURCE_URL: 'jdbc:postgresql://postgresql/employees'
+      SPRING_DATASOURCE_USERNAME: employees
+      SPRING_DATASOURCE_PASSWORD: employees
+    ports:
+      - 8080:8080
